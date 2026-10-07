@@ -16,6 +16,7 @@
 
 #include "config.h"
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -93,10 +94,17 @@ static void test_dense_rule(void)
 /*
  * main - run auditctl rules file parsing regression tests
  *
- * Returns: Zero when all tests pass.
+ * Returns: Zero when all tests pass, nonzero on unsupported architectures.
  */
 int main(void)
 {
+	/* Numeric syscall rules still require native architecture detection. */
+	if (audit_detect_machine() < 0) {
+		fputs("Native architecture is unsupported: "
+		      "no enabled syscall table\n", stderr);
+		return EXIT_FAILURE;
+	}
+
 	test_dense_rule();
 	return 0;
 }
